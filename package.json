@@ -1,0 +1,15 @@
+{
+  "name": "wasmmcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reference scaffold for a first-party IDE WASM plugin with a thin MCP skill dispatcher.",
+  "scripts": {
+    "demo": "node src/cli/demo.js",
+    "mcp": "node src/mcp/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

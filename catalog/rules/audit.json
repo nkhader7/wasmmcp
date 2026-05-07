@@ -1,0 +1,4 @@
+{
+  "on": "audit",
+  "skills": ["scan_secrets", "grep_repo"]
+}

@@ -1,0 +1,25 @@
+name = "ripgrep"
+version = "14"
+sha256 = "2726000000000000000000000000000000000000000000000000000000000a14"
+exports = ["grep"]
+
+[runtime]
+wasmtime = "24"
+fuel_cap = 5000000000
+epoch_interrupt_ms = 10
+memory_cap_mb = 256
+
+[capabilities]
+imports = [
+  "wasi:filesystem/preopens",
+  "wasi:io/streams",
+  "wasi:cli/stdout",
+  "wasi:cli/stderr",
+  "wasi:clocks/monotonic-clock",
+  "wasi:random/random",
+  "wasi:cli/environment"
+]
+filesystem = "read-only"
+preopen = "/workspace"
+sockets = "denied"
+wall_clock = "denied"

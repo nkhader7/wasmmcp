@@ -1,0 +1,20 @@
+{
+  "modules": [
+    {
+      "name": "gitleaks",
+      "version": "8.21",
+      "sha256": "9f1e00000000000000000000000000000000000000000000000000000000b203",
+      "path": "modules/gitleaks/8.21/gitleaks.wasm",
+      "manifest": "modules/gitleaks/8.21/plugin.toml",
+      "cosignVerified": true
+    },
+    {
+      "name": "ripgrep",
+      "version": "14",
+      "sha256": "2726000000000000000000000000000000000000000000000000000000000a14",
+      "path": "modules/ripgrep/14/ripgrep.wasm",
+      "manifest": "modules/ripgrep/14/plugin.toml",
+      "cosignVerified": true
+    }
+  ]
+}

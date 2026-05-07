@@ -1,0 +1,4 @@
+{
+  "on": "pre-commit",
+  "skills": ["scan_secrets"]
+}
