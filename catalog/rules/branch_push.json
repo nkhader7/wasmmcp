@@ -1,10 +1,9 @@
 {
   "on": "branch-push",
   "skills": [
-    "tob_differential_review",
-    "scan_secrets",
-    "scan_high_severity_security",
-    "scan_auth_bypass",
-    "tob_insecure_defaults"
+    "secrets__scan_workspace",
+    "analysis__security_audit",
+    "analysis__auth_bypass",
+    "analysis__insecure_defaults"
   ]
 }

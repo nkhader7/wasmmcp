@@ -99,10 +99,21 @@ function Load-Skills {
   $Skills = @{}
   $SkillsDir = Join-Path $Root "catalog\skills"
   foreach ($Path in Get-ChildItem -LiteralPath $SkillsDir -Filter "*.md" | Sort-Object Name) {
+    if (-not (Test-SkillFile $Path.Name)) { continue }
     $Skill = Parse-Skill $Path
     $Skills[$Skill.name] = $Skill
   }
   return $Skills
+}
+
+function Test-SkillFile([string]$Name) {
+  $Normalized = $Name.ToLowerInvariant()
+  return (
+    $Normalized.EndsWith(".md") -and
+    $Normalized -ne "readme.md" -and
+    $Normalized -ne "skill_template.md" -and
+    -not $Normalized.StartsWith("_")
+  )
 }
 
 function List-Tools($Skills) {

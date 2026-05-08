@@ -1,18 +1,14 @@
 {
   "on": "open-pr",
   "skills": [
-    "tob_differential_review",
-    "tob_static_analysis_semgrep",
-    "tob_insecure_defaults",
-    "tob_agentic_actions_audit",
-    "tob_fp_check",
-    "scan_secrets",
-    "scan_high_severity_security",
-    "scan_injection_flaws",
-    "scan_auth_bypass",
-    "map_cross_file_security_context",
-    "validate_security_findings",
-    "collect_patch_review_context",
-    "find_dead_code"
+    "secrets__scan_workspace",
+    "analysis__security_audit",
+    "analysis__injection_flaws",
+    "analysis__auth_bypass",
+    "analysis__insecure_defaults",
+    "analysis__dead_code",
+    "context__cross_file_map",
+    "review__validate_findings",
+    "supply_chain__manifest_audit"
   ]
 }

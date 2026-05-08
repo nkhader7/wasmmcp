@@ -138,8 +138,18 @@ class SkillDispatcher:
 def load_skills(skills_dir: pathlib.Path) -> dict[str, Skill]:
     return {
         skill.name: skill
-        for skill in (parse_skill(path) for path in sorted(skills_dir.glob("*.md")))
+        for skill in (parse_skill(path) for path in sorted(skills_dir.glob("*.md")) if is_skill_file(path.name))
     }
+
+
+def is_skill_file(file_name: str) -> bool:
+    normalized = file_name.lower()
+    return (
+        normalized.endswith(".md")
+        and normalized != "readme.md"
+        and normalized != "skill_template.md"
+        and not normalized.startswith("_")
+    )
 
 
 def load_rules(rules_dir: pathlib.Path) -> list[dict[str, Any]]:
