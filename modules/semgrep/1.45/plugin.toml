@@ -1,0 +1,29 @@
+name    = "semgrep"
+version = "1.45"
+sha256  = "3a7b000000000000000000000000000000000000000000000000000000c891af"
+exports = ["find_dead_code", "scan"]
+
+[runtime]
+wasmtime           = "24"
+fuel_cap           = 5000000000
+epoch_interrupt_ms = 10
+memory_cap_mb      = 256
+
+[capabilities]
+imports = [
+  "wasi:filesystem/preopens",
+  "wasi:io/streams",
+  "wasi:cli/stdout",
+  "wasi:cli/stderr",
+  "wasi:clocks/monotonic-clock",
+  "wasi:random/random",
+  "wasi:cli/environment"
+]
+filesystem = "read-only"
+preopen    = "/workspace"
+sockets    = "denied"
+wall_clock = "denied"
+env_allow  = []
+
+[signatures]
+cosign = "sha256:3a7b000000000000000000000000000000000000000000000000000000c891af"

@@ -1,0 +1,90 @@
+{
+  "name": "gitleaks-scanner-wasm",
+  "displayName": "Gitleaks Scanner WASM",
+  "description": "Scan your workspace for hardcoded secrets using the gitleaks WASM module. Results appear inline as VS Code diagnostics, in a dedicated panel, and in the Explorer sidebar. Workspace bytes never leave the IDE.",
+  "version": "1.0.0",
+  "publisher": "nkhader7",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": { "type": "git", "url": "git+https://github.com/nkhader7/wasmmcp.git" },
+  "engines": { "vscode": "^1.96.0" },
+  "categories": ["Linters", "Other"],
+  "keywords": ["gitleaks", "secrets", "security", "wasm", "wasi", "scanner"],
+
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+
+  "contributes": {
+    "commands": [
+      { "command": "gitleaksWasm.openPanel",   "title": "Open Results Panel",    "category": "Gitleaks", "icon": "$(shield)"         },
+      { "command": "gitleaksWasm.scan",        "title": "Scan Workspace",         "category": "Gitleaks", "icon": "$(search)"         },
+      { "command": "gitleaksWasm.scanFile",    "title": "Scan Current File",      "category": "Gitleaks", "icon": "$(file-code)"      },
+      { "command": "gitleaksWasm.clearResults","title": "Clear Results",          "category": "Gitleaks", "icon": "$(clear-all)"      },
+      { "command": "gitleaksWasm.copyJson",    "title": "Copy Findings as JSON",  "category": "Gitleaks", "icon": "$(copy)"           }
+    ],
+
+    "menus": {
+      "commandPalette": [
+        { "command": "gitleaksWasm.openPanel"    },
+        { "command": "gitleaksWasm.scan"         },
+        { "command": "gitleaksWasm.scanFile",    "when": "editorIsOpen" },
+        { "command": "gitleaksWasm.clearResults" },
+        { "command": "gitleaksWasm.copyJson"     }
+      ],
+      "editor/title": [
+        { "command": "gitleaksWasm.scanFile", "when": "editorIsOpen", "group": "navigation" }
+      ],
+      "view/title": [
+        { "command": "gitleaksWasm.scan",        "when": "view == gitleaksWasm.tree", "group": "navigation@1" },
+        { "command": "gitleaksWasm.clearResults","when": "view == gitleaksWasm.tree", "group": "navigation@2" }
+      ],
+      "explorer/context": [
+        { "command": "gitleaksWasm.scanFile", "group": "security@1" }
+      ]
+    },
+
+    "views": {
+      "explorer": [
+        { "id": "gitleaksWasm.tree", "name": "Gitleaks Findings", "icon": "$(shield)", "contextualTitle": "Gitleaks Scanner" }
+      ]
+    },
+
+    "viewsWelcome": [
+      {
+        "view": "gitleaksWasm.tree",
+        "contents": "No scan has run yet.\n[$(search) Scan Workspace](command:gitleaksWasm.scan)\n[$(window) Open Results Panel](command:gitleaksWasm.openPanel)"
+      }
+    ],
+
+    "configuration": {
+      "title": "Gitleaks Scanner WASM",
+      "properties": {
+        "gitleaksWasm.gitleaksBin": {
+          "type":        "string",
+          "default":     "",
+          "description": "Path to the gitleaks binary (optional). Example: D:\\Download\\gitleaks\\gitleaks_8.30.1_windows_arm64\\gitleaks.exe. When blank, the JS mock scanner is used."
+        },
+        "gitleaksWasm.redact": {
+          "type":        "boolean",
+          "default":     true,
+          "description": "Replace secret values with **** in all UI output."
+        },
+        "gitleaksWasm.severityFilter": {
+          "type":        "string",
+          "enum":        ["all", "critical", "high", "medium", "low"],
+          "default":     "all",
+          "description": "Minimum severity to show in the panel and diagnostics."
+        },
+        "gitleaksWasm.autoScanOnOpen": {
+          "type":        "boolean",
+          "default":     false,
+          "description": "Run a full workspace scan automatically when the extension activates."
+        }
+      }
+    }
+  },
+
+  "scripts": {
+    "package": "npx @vscode/vsce package --no-dependencies --out gitleaks-scanner-wasm.vsix"
+  }
+}

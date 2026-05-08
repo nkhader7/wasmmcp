@@ -9,11 +9,35 @@
       "cosignVerified": true
     },
     {
+      "name": "gitleaks",
+      "version": "8.30",
+      "sha256": "7e4a000000000000000000000000000000000000000000000000000000d512c3",
+      "path": "modules/gitleaks/8.30/gitleaks.wasm",
+      "manifest": "modules/gitleaks/8.30/plugin.toml",
+      "cosignVerified": true
+    },
+    {
       "name": "ripgrep",
       "version": "14",
       "sha256": "2726000000000000000000000000000000000000000000000000000000000a14",
       "path": "modules/ripgrep/14/ripgrep.wasm",
       "manifest": "modules/ripgrep/14/plugin.toml",
+      "cosignVerified": true
+    },
+    {
+      "name": "semgrep",
+      "version": "1.45",
+      "sha256": "3a7b000000000000000000000000000000000000000000000000000000c891af",
+      "path": "modules/semgrep/1.45/semgrep.wasm",
+      "manifest": "modules/semgrep/1.45/plugin.toml",
+      "cosignVerified": true
+    },
+    {
+      "name": "tree-sitter",
+      "version": "0.22",
+      "sha256": "5c2d000000000000000000000000000000000000000000000000000000f347bb",
+      "path": "modules/tree-sitter/0.22/tree-sitter.wasm",
+      "manifest": "modules/tree-sitter/0.22/plugin.toml",
       "cosignVerified": true
     }
   ]

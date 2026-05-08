@@ -1,4 +1,9 @@
 {
   "on": "pre-commit",
-  "skills": ["scan_secrets"]
+  "skills": [
+    "scan_secrets",
+    "scan_diff",
+    "scan_injection_flaws",
+    "tob_insecure_defaults"
+  ]
 }

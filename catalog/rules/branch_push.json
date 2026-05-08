@@ -1,0 +1,10 @@
+{
+  "on": "branch-push",
+  "skills": [
+    "tob_differential_review",
+    "scan_secrets",
+    "scan_high_severity_security",
+    "scan_auth_bypass",
+    "tob_insecure_defaults"
+  ]
+}

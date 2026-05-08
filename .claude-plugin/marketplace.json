@@ -1,0 +1,25 @@
+{
+  "plugins": [
+    {
+      "name": "secret-scanner",
+      "version": "0.1.0",
+      "description": "Detects hardcoded secrets, credentials, and API keys in source code and git history using gitleaks rules. Runs entirely in a sandboxed WASM module; workspace bytes never leave the IDE.",
+      "author": { "name": "Naz Khader", "url": "https://github.com/nkhader7" },
+      "source": "./plugins/secret-scanner"
+    },
+    {
+      "name": "static-analysis",
+      "version": "0.1.0",
+      "description": "AST-aware static analysis for dead code elimination and structural security issues using semgrep and tree-sitter WASM modules.",
+      "author": { "name": "Naz Khader", "url": "https://github.com/nkhader7" },
+      "source": "./plugins/static-analysis"
+    },
+    {
+      "name": "supply-chain-audit",
+      "version": "0.1.0",
+      "description": "Audits third-party dependencies for known vulnerabilities, license violations, and typosquatting. Runs offline against a local advisory database.",
+      "author": { "name": "Naz Khader", "url": "https://github.com/nkhader7" },
+      "source": "./plugins/supply-chain-audit"
+    }
+  ]
+}

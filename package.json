@@ -1,13 +1,40 @@
 {
   "name": "wasmmcp",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "mcpName": "io.github.nkhader7/wasmmcp",
   "type": "module",
   "description": "Reference scaffold for a first-party IDE WASM plugin with a thin MCP skill dispatcher.",
+  "bin": {
+    "wasmmcp": "./bin/wasmmcp.js"
+  },
   "scripts": {
     "demo": "node src/cli/demo.js",
+    "mcp:http": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File src/mcp/http-server.ps1 -Port 8765",
     "mcp": "node src/mcp/server.js",
+    "prepublishOnly": "node --test",
     "test": "node --test"
+  },
+  "files": [
+    "bin/",
+    "catalog/",
+    "modules/",
+    "src/",
+    "server.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "wasm",
+    "wasi",
+    "gitleaks"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nkhader7/wasmmcp.git"
   },
   "engines": {
     "node": ">=20"

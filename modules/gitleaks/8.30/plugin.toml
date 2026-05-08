@@ -1,0 +1,29 @@
+name    = "gitleaks"
+version = "8.30"
+sha256  = "7e4a000000000000000000000000000000000000000000000000000000d512c3"
+exports = ["scan_repo", "scan_diff"]
+
+[runtime]
+wasmtime           = "24"
+fuel_cap           = 5000000000
+epoch_interrupt_ms = 10
+memory_cap_mb      = 256
+
+[capabilities]
+imports = [
+  "wasi:filesystem/preopens",
+  "wasi:io/streams",
+  "wasi:cli/stdout",
+  "wasi:cli/stderr",
+  "wasi:clocks/monotonic-clock",
+  "wasi:random/random",
+  "wasi:cli/environment"
+]
+filesystem = "read-only"
+preopen    = "/workspace"
+sockets    = "denied"
+wall_clock = "denied"
+env_allow  = ["GITLEAKS_CONFIG"]
+
+[signatures]
+cosign = "sha256:7e4a000000000000000000000000000000000000000000000000000000d512c3"

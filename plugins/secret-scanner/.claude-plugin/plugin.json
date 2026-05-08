@@ -1,0 +1,7 @@
+{
+  "name": "secret-scanner",
+  "version": "0.1.0",
+  "description": "Detects hardcoded secrets, credentials, and API keys using gitleaks rules in a sandboxed WASM module.",
+  "author": { "name": "Naz Khader", "url": "https://github.com/nkhader7" },
+  "keywords": ["security", "secrets", "gitleaks", "wasm", "mcp"]
+}

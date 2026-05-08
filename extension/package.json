@@ -1,0 +1,130 @@
+{
+  "name": "wasmmcp-vscode",
+  "displayName": "WASM MCP Plugin",
+  "description": "First-party IDE plugin: wasmtime runtime + local module registry for MCP skills. Runs gitleaks and other WASM modules locally; workspace bytes never leave the IDE process.",
+  "version": "0.3.0",
+  "publisher": "nkhader7",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nkhader7/wasmmcp.git"
+  },
+  "engines": { "vscode": "^1.96.0" },
+  "categories": ["Linters", "Other"],
+  "keywords": ["mcp", "wasm", "wasi", "gitleaks", "secrets", "security"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+
+  "contributes": {
+    "commands": [
+      {
+        "command": "wasmmcp.scanSecrets",
+        "title": "Scan Workspace for Secrets",
+        "category": "WASM MCP",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "wasmmcp.scanDiff",
+        "title": "Scan Staged Changes",
+        "category": "WASM MCP",
+        "icon": "$(git-commit)"
+      },
+      {
+        "command": "wasmmcp.clearFindings",
+        "title": "Clear Findings",
+        "category": "WASM MCP",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "wasmmcp.startMcpServer",
+        "title": "Start MCP Skill Server",
+        "category": "WASM MCP",
+        "icon": "$(server)"
+      }
+    ],
+
+    "menus": {
+      "commandPalette": [
+        { "command": "wasmmcp.scanSecrets" },
+        { "command": "wasmmcp.scanDiff" },
+        { "command": "wasmmcp.clearFindings" },
+        { "command": "wasmmcp.startMcpServer" }
+      ],
+      "view/title": [
+        {
+          "command": "wasmmcp.scanSecrets",
+          "when": "view == wasmmcp.findings",
+          "group": "navigation@1"
+        },
+        {
+          "command": "wasmmcp.clearFindings",
+          "when": "view == wasmmcp.findings",
+          "group": "navigation@2"
+        }
+      ]
+    },
+
+    "views": {
+      "explorer": [
+        {
+          "id": "wasmmcp.findings",
+          "name": "Security Findings",
+          "icon": "$(shield)",
+          "contextualTitle": "WASM MCP Security Findings"
+        }
+      ]
+    },
+
+    "viewsWelcome": [
+      {
+        "view": "wasmmcp.findings",
+        "contents": "No scan has been run yet.\n[Scan for Secrets](command:wasmmcp.scanSecrets)\n[Scan Staged Changes](command:wasmmcp.scanDiff)"
+      }
+    ],
+
+    "configuration": {
+      "title": "WASM MCP Plugin",
+      "properties": {
+        "wasmmcp.gitleaksBin": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the gitleaks binary. When set, the extension runs the real binary instead of the JS mock. Example: D:\\Download\\gitleaks\\gitleaks_8.30.1_windows_arm64\\gitleaks.exe"
+        },
+        "wasmmcp.redact": {
+          "type": "boolean",
+          "default": true,
+          "description": "Redact secret values in finding snippets before displaying in VS Code."
+        },
+        "wasmmcp.severityThreshold": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "default": "low",
+          "description": "Minimum severity to show as a VS Code diagnostic."
+        },
+        "wasmmcp.autoScanOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically scan staged changes whenever a file is saved."
+        },
+        "wasmmcp.mcpServerAutoStart": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically start the local MCP skill server when the extension activates."
+        }
+      }
+    }
+  },
+
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch":   "tsc -p ./ --watch",
+    "build":   "npm run compile",
+    "package": "npm run compile && npx vsce package"
+  },
+
+  "devDependencies": {
+    "@types/node":   "^20.0.0",
+    "@types/vscode": "^1.96.0",
+    "typescript":    "^5.0.0"
+  }
+}

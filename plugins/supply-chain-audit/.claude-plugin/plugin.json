@@ -1,0 +1,7 @@
+{
+  "name": "supply-chain-audit",
+  "version": "0.1.0",
+  "description": "Audits third-party dependencies for known vulnerabilities, license violations, and typosquatting using offline advisory databases.",
+  "author": { "name": "Naz Khader", "url": "https://github.com/nkhader7" },
+  "keywords": ["security", "supply-chain", "dependencies", "sbom", "vulnerabilities", "wasm"]
+}

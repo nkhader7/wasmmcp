@@ -1,0 +1,34 @@
+// WIT interface for the gitleaks WASM plugin.
+// World: wasi:cli/command — the module is a CLI binary that receives args via
+// wasi:cli/environment and wasi:cli/arguments and writes JSON to wasi:cli/stdout.
+//
+// The dispatcher invokes the module by constructing a per-invocation WASI context:
+//   argv  = ["gitleaks", "detect", "--source", "/workspace", "--redact", "--report-format", "json"]
+//   env   = { GITLEAKS_CONFIG: "/workspace/.gitleaks.toml" }    (optional)
+//   fd=3  = preopened /workspace (read-only)
+//
+// Output (stdout): JSON object matching the Finding[] shape in types.rs.
+
+package mcp:gitleaks@8.30.1;
+
+// Re-export the standard wasi:cli/command world so the binary is a first-class
+// wasip2 component. The host links exactly the imports listed below and nothing else.
+world scanner {
+    // Granted by capability broker
+    import wasi:filesystem/preopens@0.2.0;
+    import wasi:filesystem/types@0.2.0;
+    import wasi:io/streams@0.2.0;
+    import wasi:cli/stdout@0.2.0;
+    import wasi:cli/stderr@0.2.0;
+    import wasi:cli/stdin@0.2.0;
+    import wasi:cli/environment@0.2.0;
+    import wasi:cli/exit@0.2.0;
+    import wasi:clocks/monotonic-clock@0.2.0;
+    import wasi:random/random@0.2.0;
+
+    // wasi:sockets is intentionally absent — the broker never links it.
+    // wasi:clocks/wall-clock is intentionally absent — wall-clock denied.
+
+    // Module entry point: run is called by the host after linking.
+    export wasi:cli/run@0.2.0;
+}

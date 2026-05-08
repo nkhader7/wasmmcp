@@ -1,0 +1,21 @@
+[package]
+name    = "gitleaks-wasm"
+version = "8.30.1"
+edition = "2021"
+description = "gitleaks secret scanner compiled to wasm32-wasip2"
+
+[[bin]]
+name = "gitleaks"
+path = "src/main.rs"
+
+[dependencies]
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml       = { version = "0.8", default-features = false, features = ["parse"] }
+regex      = { version = "1", default-features = false, features = ["std", "unicode-perl"] }
+
+[profile.release]
+opt-level = "z"   # minimise .wasm size
+lto       = true
+strip     = true
+panic     = "abort"

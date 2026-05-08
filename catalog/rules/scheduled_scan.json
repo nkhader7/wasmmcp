@@ -1,28 +1,20 @@
 {
-  "on": "audit",
+  "on": "scheduled-scan",
   "skills": [
     "tob_audit_context",
     "tob_static_analysis_semgrep",
     "tob_insecure_defaults",
     "tob_sharp_edges",
-    "tob_variant_analysis",
     "tob_supply_chain_manifest_audit",
     "tob_zeroize_source_audit",
     "tob_c_cpp_security_review",
-    "tob_agentic_actions_audit",
     "tob_constant_time_analysis",
-    "tob_fp_check",
     "scan_secrets",
     "scan_high_severity_security",
     "scan_injection_flaws",
     "scan_auth_bypass",
     "scan_memory_corruption",
     "map_cross_file_security_context",
-    "validate_security_findings",
-    "collect_patch_review_context",
-    "scan_diff",
-    "grep_repo",
-    "find_dead_code",
-    "parse_ast"
+    "validate_security_findings"
   ]
 }

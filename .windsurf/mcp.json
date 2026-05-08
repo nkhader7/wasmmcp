@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "wasmmcp": {
+      "command": "node",
+      "args": ["./bin/wasmmcp.js"],
+      "type": "stdio",
+      "description": "WASM MCP skill dispatcher — runs gitleaks, semgrep, ripgrep, tree-sitter locally via sandboxed WASM. Workspace bytes never leave the IDE process."
+    }
+  }
+}
