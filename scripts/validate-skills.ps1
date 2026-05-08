@@ -29,7 +29,7 @@ foreach ($File in $SkillFiles) {
   $Frontmatter = $Match.Groups[1].Value
   $Body = $Match.Groups[2].Value
 
-  foreach ($Field in @("module", "sha256", "when", "args", "caps", "export")) {
+  foreach ($Field in @("name", "category", "module", "sha256", "description", "when", "args", "caps", "export")) {
     if ($Frontmatter -notmatch "(?m)^$Field\s*:") {
       $Errors += "$($File.Name): missing $Field"
     }

@@ -1,6 +1,9 @@
 {
   "on": "open-pr",
   "skills": [
+    "iac__ansible_checkov_audit",
+    "cis__docker_benchmark_audit",
+    "cis__kubernetes_benchmark_audit",
     "secrets__scan_workspace",
     "analysis__security_audit",
     "analysis__injection_flaws",

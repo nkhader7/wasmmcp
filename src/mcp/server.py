@@ -23,6 +23,7 @@ SERVER_VERSION = "0.3.0"
 class Skill:
     name: str
     title: str
+    description: str
     module: str
     version: str
     sha256: str
@@ -107,7 +108,7 @@ class SkillDispatcher:
             {
                 "name": skill.name,
                 "title": skill.title,
-                "description": f"Resolve local module {skill.module}@{skill.version}",
+                "description": skill.description or f"Resolve local module {skill.module}@{skill.version}",
                 "inputSchema": {"type": "object", "additionalProperties": True},
             }
             for skill in self.skills.values()
@@ -171,6 +172,7 @@ def parse_skill(path: pathlib.Path) -> Skill:
     return Skill(
         name=path.stem,
         title=extract_title(body),
+        description=str(meta.get("description", "")),
         module=module,
         version=version,
         sha256=str(meta.get("sha256", "")),

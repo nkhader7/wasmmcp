@@ -4,8 +4,11 @@ Copy this file to `catalog/skills/<skill_name>.md`, then fill in every placehold
 
 ```markdown
 ---
+name: <category>__<skill_name>
+category: <category>
 module: <module-name>@<version>
 sha256: <module-sha256>
+description: <one sentence description returned to MCP clients>
 when: <event-or-intent>, <event-or-intent>
 args:
   path: /workspace
@@ -28,8 +31,11 @@ Mention what the agent should do with the returned findings, but do not imply th
 
 | Field | Meaning |
 |---|---|
+| `name` | Tool name exposed by MCP. Use `category__snake_case_name`. |
+| `category` | Skill family such as `analysis`, `context`, `secrets`, `cis`, or `review`. |
 | `module` | Local module reference as `name@version`. |
 | `sha256` | Pinned module hash from `modules/index.json`. |
+| `description` | Tool description used by MCP clients. |
 | `when` | Comma-separated triggers or user intents. |
 | `args` | Structured arguments marshalled into the module export. |
 | `caps` | Capability set requested for the invocation. |

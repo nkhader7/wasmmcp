@@ -18,7 +18,7 @@ catalog/skills/
 Runnable skill files should:
 
 - use `snake_case.md` names
-- include complete frontmatter
+- include complete frontmatter: `name`, `category`, `module`, `sha256`, `description`, `when`, `args`, `caps`, and `export`
 - reference modules as `name@version`
 - include the pinned `sha256`
 - include `args.path: /workspace`
@@ -31,10 +31,14 @@ Documentation and templates are skipped by the catalog loader when the file name
 
 ```yaml
 ---
+name: analysis__example_skill
+category: analysis
 module: semgrep@1.45
 sha256: 3a7b000000000000000000000000000000000000000000000000000000c891af
+description: Short tool description returned to the MCP client.
 when: audit, open-pr
 args:
+  path: /workspace
   language: auto
   rules: p/security-audit
   severity: medium+
@@ -87,3 +91,5 @@ The validator checks required frontmatter fields, `args.path: /workspace`, `fs:r
 The `tob_*` files adapt the public Trail of Bits skills marketplace into local MCP dispatcher recipes. They are original mappings to this project's local module registry, not copies of the upstream skill bodies. See [../../docs/trailofbits-skill-map.md](../../docs/trailofbits-skill-map.md) for the coverage map and scoped-down capabilities.
 
 The `pytm_threat_model` skill gathers local context for an agent-generated OWASP pytm model. See [../../docs/pytm-threat-model-workflow.md](../../docs/pytm-threat-model-workflow.md).
+
+The `cis__docker_benchmark_audit` and `cis__kubernetes_benchmark_audit` skills collect results from local CIS Docker and Kubernetes audit scripts. See [../../docs/cis-benchmark-audit.md](../../docs/cis-benchmark-audit.md).

@@ -1,0 +1,9 @@
+{
+  "on": "cis-benchmark",
+  "skills": [
+    "cis__docker_benchmark_audit",
+    "cis__kubernetes_benchmark_audit",
+    "analysis__security_audit",
+    "supply_chain__manifest_audit"
+  ]
+}

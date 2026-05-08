@@ -76,6 +76,7 @@ function Parse-Skill($Path) {
   return [ordered]@{
     name = [System.IO.Path]::GetFileNameWithoutExtension($Path.Name)
     title = Extract-Title $Match.Groups[2].Value
+    description = [string]$Meta["description"]
     module = $ModuleParts[0]
     version = $ModuleParts[1]
     sha256 = [string]$Meta["sha256"]
@@ -112,7 +113,7 @@ function List-Tools($Skills) {
     [ordered]@{
       name = $_.name
       title = $_.title
-      description = "Resolve local module $($_.module)@$($_.version)"
+      description = if ($_.description) { $_.description } else { "Resolve local module $($_.module)@$($_.version)" }
       inputSchema = [ordered]@{
         type = "object"
         additionalProperties = $true

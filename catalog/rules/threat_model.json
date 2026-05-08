@@ -1,9 +1,9 @@
 {
   "on": "threat-model",
   "skills": [
-    "pytm_threat_model",
-    "tob_audit_context",
-    "map_cross_file_security_context",
-    "validate_security_findings"
+    "context__cross_file_map",
+    "context__parse_ast",
+    "review__validate_findings",
+    "analysis__security_audit"
   ]
 }

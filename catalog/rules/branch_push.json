@@ -1,6 +1,8 @@
 {
   "on": "branch-push",
   "skills": [
+    "iac__ansible_checkov_audit",
+    "cis__docker_benchmark_audit",
     "secrets__scan_workspace",
     "analysis__security_audit",
     "analysis__auth_bypass",

@@ -1,6 +1,9 @@
 {
   "on": "audit",
   "skills": [
+    "iac__ansible_checkov_audit",
+    "cis__docker_benchmark_audit",
+    "cis__kubernetes_benchmark_audit",
     "secrets__scan_workspace",
     "secrets__scan_staged",
     "analysis__security_audit",
