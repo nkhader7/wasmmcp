@@ -48,12 +48,17 @@ class GitleaksPanel {
   }
 
   _onMessage(msg) {
-    if (msg.type === "scan")  vscode.commands.executeCommand("gitleaksWasm.scan");
-    if (msg.type === "open")  vscode.commands.executeCommand("vscode.open",
-      vscode.Uri.file(msg.path),
-      { selection: new vscode.Range(Math.max(0, msg.line - 1), 0, Math.max(0, msg.line - 1), 999) }
-    );
-    if (msg.type === "copy")  vscode.env.clipboard.writeText(JSON.stringify(this._findings, null, 2))
+    if (msg.type === "scan") vscode.commands.executeCommand("gitleaksWasm.scan");
+    if (msg.type === "open") {
+      const path    = require("path");
+      const wsRoot  = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
+      const absPath = path.isAbsolute(msg.path) ? msg.path : path.join(wsRoot, msg.path);
+      vscode.commands.executeCommand("vscode.open",
+        vscode.Uri.file(absPath),
+        { selection: new vscode.Range(Math.max(0, msg.line - 1), 0, Math.max(0, msg.line - 1), 999) }
+      );
+    }
+    if (msg.type === "copy") vscode.env.clipboard.writeText(JSON.stringify(this._findings, null, 2))
       .then(() => vscode.window.showInformationMessage("Findings copied to clipboard."));
     if (msg.type === "clear") vscode.commands.executeCommand("gitleaksWasm.clearResults");
   }

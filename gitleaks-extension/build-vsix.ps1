@@ -24,8 +24,8 @@ Copy-Item "$EXT_DIR\out\tree-view.js"  "$STAGE_DIR\extension\out\tree-view.js"
 
 Write-Host "[3/4] Writing VSIX manifests..."
 
-# [Content_Types].xml — required by the OPC container format
-@'
+# Use WriteAllText for PS 5.1 compatibility (Set-Content -Encoding UTF8 has issues with piped here-strings)
+$contentTypes = @'
 <?xml version="1.0" encoding="utf-8"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="vsixmanifest" ContentType="text/xml"/>
@@ -35,10 +35,10 @@ Write-Host "[3/4] Writing VSIX manifests..."
   <Default Extension="txt"          ContentType="text/plain"/>
   <Default Extension="ps1"          ContentType="text/plain"/>
 </Types>
-'@ | Set-Content "$STAGE_DIR\[Content_Types].xml" -Encoding utf8
+'@
+[System.IO.File]::WriteAllText("$STAGE_DIR\[Content_Types].xml", $contentTypes, [System.Text.Encoding]::UTF8)
 
-# extension.vsixmanifest
-@'
+$vsixManifest = @'
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0"
   xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011"
@@ -68,7 +68,8 @@ Write-Host "[3/4] Writing VSIX manifests..."
            Addressable="true"/>
   </Assets>
 </PackageManifest>
-'@ | Set-Content "$STAGE_DIR\extension.vsixmanifest" -Encoding utf8
+'@
+[System.IO.File]::WriteAllText("$STAGE_DIR\extension.vsixmanifest", $vsixManifest, [System.Text.Encoding]::UTF8)
 
 Write-Host "[4/4] Packaging into .vsix..."
 Remove-Item $OUT_FILE -Force -ErrorAction SilentlyContinue
