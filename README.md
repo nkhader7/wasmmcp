@@ -412,4 +412,154 @@ The MCP server only catalogs *which* module to invoke and *when*. It never recei
 
 ---
 
-*WASM plugin architecture · v0.3 · 2026-05-06*
+## § 07 · Sidecar mode — real findings in Cascade (no downloads)
+
+`LOCAL EXECUTION · STDIO CHILD · WORKSPACE STAYS ON-MACHINE`
+
+Sidecar mode activates when `SIDECAR_WORKSPACE` is set. The MCP server runs as a **local stdio subprocess of the IDE** — a trusted child process sharing the same filesystem. No WASM binary is needed; the built-in JS mock layers handle gitleaks and ripgrep scans. Nothing is downloaded. Nothing leaves the machine.
+
+### Cascade end-to-end flow
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  YOUR MACHINE — all bytes stay here                                        │
+│                                                                            │
+│  ┌──────────────────────┐   stdio (JSON-RPC 2.0)   ┌────────────────────┐  │
+│  │  Windsurf / Cascade  │ ──────────────────────▶  │  MCP server        │  │
+│  │  (MCP client)        │                          │  src/mcp/server.js │  │
+│  │                      │ ◀──────────────────────  │  SIDECAR_WORKSPACE │  │
+│  │  "scan my workspace  │   findings markdown +    │  = ./              │  │
+│  │   for secrets"       │   severity table         │                    │  │
+│  └──────────────────────┘                          │  SidecarExecutor   │  │
+│                                                    │  ── reads workspace│  │
+│                                                    │  ── runs JS mock   │  │
+│                                                    │  ── renders result │  │
+│                                                    └────────────────────┘  │
+│                                                             │              │
+│                                              reads files from workspace    │
+│                                                             ▼              │
+│                                         ┌──────────────────────────────┐  │
+│                                         │  YOUR WORKSPACE              │  │
+│                                         │  /projects/myapp/            │  │
+│                                         │  read-only · local only      │  │
+│                                         └──────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Step-by-step call trace (sidecar mode)
+
+```
+t = 0      Cascade → MCP server (stdio)
+           { "method": "tools/call",
+             "params": { "name": "secrets__scan_workspace",
+                         "arguments": { "path": "." } } }
+
+           server.js: route("tools/call") → dispatcher.resolveToolCall()
+                      → sidecar !== null → sidecar.execute(invokeLocal)
+
+t = 10ms   SidecarExecutor.execute()
+           moduleRef = "gitleaks@8.21"   name = "gitleaks"
+           args.path  → resolved to workspaceRoot (process.cwd())
+           WasmHost.invoke()
+             Layer 1: wasmPath null → existsSync("") = false → skip
+             Layer 2: GITLEAKS_BIN not set → skip
+             Layer 3: JS mock → scanRepo(workspaceRoot, args)
+                      readWorkspaceFiles() · applyRules() · entropy gate
+
+t = 400ms  findings → renderFindings()
+           → markdown severity table + resource URI
+
+           MCP server → Cascade (stdio)
+           { "result": {
+               "content": [
+                 { "type": "text",
+                   "text": "Found 2 secret finding(s) (1 high · 1 medium)…\n\n
+                            | Severity | Rule           | Location      | Snippet |\n
+                            |▲ HIGH    | aws-access-key | config.env:14 | AKIA*** |\n
+                            …" },
+                 { "type": "resource",
+                   "resource": { "uri": "mcp://findings/scan-x7k/findings.json" } }
+               ],
+               "_meta": { "durationMs": 392, "filesScanned": 143 }
+             } }
+
+Cascade displays the markdown table in chat. ✓
+```
+
+### How to activate in Windsurf
+
+The config is already in the repo at [.windsurf/mcp.json](.windsurf/mcp.json):
+
+```json
+{
+  "mcpServers": {
+    "wasmmcp": {
+      "command": "node",
+      "args": ["./src/mcp/server.js"],
+      "env": {
+        "SIDECAR_WORKSPACE": "."
+      }
+    }
+  }
+}
+```
+
+Open this repo in Windsurf → Cascade automatically picks up the MCP server → all skills appear as available tools. Ask Cascade to run any skill by name or by intent.
+
+### Skills available in sidecar mode
+
+| Skill | Module | Works | What it scans |
+|---|---|---|---|
+| `secrets__scan_workspace` | `gitleaks@8.21` | ✓ | All files for hardcoded secrets |
+| `secrets__scan_staged` | `gitleaks@8.21` | ✓ | Staged / uncommitted changes |
+| `context__grep` | `ripgrep@14` | ✓ | Text / regex search across workspace |
+| `cis__docker_benchmark_audit` | `ripgrep@14` | ✓ | Docker CIS audit evidence |
+| `cis__kubernetes_benchmark_audit` | `ripgrep@14` | ✓ | Kubernetes CIS audit evidence |
+| `iac__ansible_checkov_audit` | `semgrep@1.45` | ✗ graceful error | Needs Path B VSIX |
+| `analysis__*` | `semgrep@1.45` | ✗ graceful error | Needs Path B VSIX |
+
+### Data boundary in sidecar mode
+
+| | Value |
+|---|---|
+| Leaves the machine | Never |
+| Leaves the IDE process | Server is a stdio child — same machine, trusted local subprocess |
+| Workspace sent to MCP server | Read locally; never serialized to the MCP server across a network |
+| Workspace sent to Cascade/LLM | Only the rendered findings markdown (not raw file content) |
+| Downloads on invocation | Zero |
+
+---
+
+## § 08 · Deployment paths
+
+`TWO PATHS — SAME RESULT IN CASCADE CHAT`
+
+```
+┌─────────────────────────────────┬─────────────────────────────────────────┐
+│  Path A · Sidecar (today)       │  Path B · VSIX extension (full arch)    │
+├─────────────────────────────────┼─────────────────────────────────────────┤
+│                                 │                                         │
+│  Windsurf spawns server.js      │  Windsurf loads bundled VSIX extension  │
+│  as stdio subprocess            │  containing wasmtime 24 runtime         │
+│                                 │                                         │
+│  SIDECAR_WORKSPACE=. activates  │  Extension intercepts _meta.invokeLocal │
+│  SidecarExecutor in server.js   │  from dispatcher, runs .wasm locally    │
+│                                 │                                         │
+│  JS mock handles gitleaks +     │  All modules supported: gitleaks,       │
+│  ripgrep · semgrep unavailable  │  semgrep, ripgrep, tree-sitter          │
+│                                 │                                         │
+│  Data boundary: same process    │  Data boundary: in-process (WASM caps)  │
+│  tree on same machine           │  enforced at link time by broker        │
+│                                 │                                         │
+│  Effort: zero — already shipped │  Effort: VSIX build + signing (~2 days) │
+│                                 │                                         │
+│  Matches CLAUDE.md arch: No     │  Matches CLAUDE.md arch: Yes           │
+│  (server reads workspace)       │  (IDE plugin reads workspace)           │
+└─────────────────────────────────┴─────────────────────────────────────────┘
+```
+
+Both paths produce identical output in Cascade chat. The architectural difference is **which process** reads workspace bytes — never whether they leave the machine.
+
+---
+
+*WASM plugin architecture · v0.4 · 2026-05-08*
