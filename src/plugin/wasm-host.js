@@ -10,6 +10,11 @@ import {
   ALLOWLIST_VALUE_REGEXES,
   shannonEntropy
 } from "./gitleaks-patterns.js";
+import {
+  CHECKOV_ALL_RESOURCE_RULESET,
+  findCheckovRulesForLine,
+  inferIacTypeFromPath
+} from "../rules/checkov-all-resource-scans.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -46,6 +51,9 @@ export class WasmHost {
     }
 
     if (module.name === "ripgrep") {
+      if (args.rules === CHECKOV_ALL_RESOURCE_RULESET.name) {
+        return scanCheckovAllResourceScans(workspaceRoot, args);
+      }
       return grepRepo(workspaceRoot, args);
     }
 
@@ -182,11 +190,12 @@ async function grepRepo(workspaceRoot, args) {
   const started  = performance.now();
   const findings = [];
   const files    = await readWorkspaceFiles(workspaceRoot);
+  const matcher  = buildTextMatcher(query);
 
   for (const file of files) {
     const lines = file.text.split(/\r?\n/);
     for (let i = 0; i < lines.length; i += 1) {
-      if (lines[i].includes(query)) {
+      if (matcher(lines[i])) {
         findings.push({
           rule: "text-match", severity: "info",
           path: file.path, line: i + 1,
@@ -201,6 +210,78 @@ async function grepRepo(workspaceRoot, args) {
     findings: findings.slice(0, Number(args.maxMatches ?? 1000)),
     _meta: { durationMs: Math.round(performance.now() - started), fuelConsumed: 1000, filesScanned: files.length }
   };
+}
+
+async function scanCheckovAllResourceScans(workspaceRoot, args) {
+  const started    = performance.now();
+  const findings   = [];
+  const files      = await readWorkspaceFiles(workspaceRoot);
+  const maxMatches = Number(args.maxMatches ?? 20000);
+
+  for (const file of files) {
+    if (!isIacPath(file.path)) continue;
+
+    const iacType = inferIacTypeFromPath(file.path);
+    const lines   = file.text.split(/\r?\n/);
+
+    for (let i = 0; i < lines.length; i += 1) {
+      const matchedRules = findCheckovRulesForLine(lines[i], { iacType, limit: 8 });
+      for (const rule of matchedRules) {
+        findings.push({
+          rule:            rule.id,
+          severity:        "medium",
+          path:            file.path,
+          line:            i + 1,
+          policy:          rule.policy,
+          iac:             rule.iac,
+          entity:          rule.entity,
+          resourceLink:    rule.resourceUrl,
+          redactedSnippet: lines[i].trim(),
+          confidence:      "candidate"
+        });
+
+        if (findings.length >= maxMatches) break;
+      }
+      if (findings.length >= maxMatches) break;
+    }
+    if (findings.length >= maxMatches) break;
+  }
+
+  return {
+    summary: `${findings.length} Checkov candidate finding(s) from ${CHECKOV_ALL_RESOURCE_RULESET.ruleCount} rules`,
+    findings,
+    _meta: {
+      durationMs:   Math.round(performance.now() - started),
+      fuelConsumed: 1000,
+      filesScanned: files.length,
+      rulesLoaded:  CHECKOV_ALL_RESOURCE_RULESET.ruleCount,
+      ruleSet:      CHECKOV_ALL_RESOURCE_RULESET.name
+    }
+  };
+}
+
+function buildTextMatcher(query) {
+  try {
+    const re = new RegExp(query, "i");
+    return (line) => re.test(line);
+  } catch {
+    return (line) => line.includes(query);
+  }
+}
+
+function isIacPath(filePath) {
+  const p = String(filePath ?? "").replace(/\\/g, "/").toLowerCase();
+  return (
+    p.endsWith("dockerfile") ||
+    p.includes("/dockerfile") ||
+    p.endsWith(".tf") ||
+    p.endsWith(".tfvars") ||
+    p.endsWith(".yaml") ||
+    p.endsWith(".yml") ||
+    p.endsWith(".json") ||
+    p.endsWith(".template") ||
+    p.endsWith(".bicep")
+  );
 }
 
 // ── Rule application ─────────────────────────────────────────────────────────

@@ -88,7 +88,7 @@
         "wasmmcp.gitleaksBin": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to the gitleaks binary. When set, the extension runs the real binary instead of the JS mock. Example: D:\\Download\\gitleaks\\gitleaks_8.30.1_windows_arm64\\gitleaks.exe"
+          "description": "Absolute path to the gitleaks binary. When set, the extension runs the real binary instead of the JS mock."
         },
         "wasmmcp.redact": {
           "type": "boolean",

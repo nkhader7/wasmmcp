@@ -17,12 +17,12 @@ $PROFILE = "release"
 $OUT_DIR = "../../modules/gitleaks/8.30"
 
 Write-Host "[1/3] Ensuring gitleaks.toml is present..."
-$tomlSrc = "D:\Download\gitleaks\gitleaks.toml"
-if (-not (Test-Path "gitleaks.toml") -and (Test-Path $tomlSrc)) {
+$tomlSrc = $env:GITLEAKS_TOML
+if (-not (Test-Path "gitleaks.toml") -and $tomlSrc -and (Test-Path $tomlSrc)) {
     Copy-Item $tomlSrc "gitleaks.toml"
-    Write-Host "      Copied from $tomlSrc"
+    Write-Host "      Copied from configured GITLEAKS_TOML"
 } elseif (-not (Test-Path "gitleaks.toml")) {
-    Write-Error "gitleaks.toml not found. Copy D:\Download\gitleaks\gitleaks.toml here first."
+    Write-Error "gitleaks.toml not found. Place it in wasm/gitleaks or set GITLEAKS_TOML to its source path."
 }
 
 Write-Host "[2/3] Building gitleaks-wasm ($TARGET $PROFILE)..."

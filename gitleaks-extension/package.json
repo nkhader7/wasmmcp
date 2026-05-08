@@ -61,7 +61,7 @@
         "gitleaksWasm.gitleaksBin": {
           "type":        "string",
           "default":     "",
-          "description": "Path to the gitleaks binary (optional). Example: D:\\Download\\gitleaks\\gitleaks_8.30.1_windows_arm64\\gitleaks.exe. When blank, the JS mock scanner is used."
+          "description": "Path to the gitleaks binary (optional). When blank, the JS mock scanner is used."
         },
         "gitleaksWasm.redact": {
           "type":        "boolean",

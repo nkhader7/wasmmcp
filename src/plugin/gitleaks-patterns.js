@@ -1,4 +1,4 @@
-// Patterns derived from D:\Download\gitleaks\gitleaks.toml (gitleaks v8.30.1).
+// Patterns derived from gitleaks v8.30.1 rule definitions.
 // Each entry maps to one [[rules]] block. Regex translated from PCRE/Go RE2 to JS.
 // severity is assigned by impact tier, not present in upstream config.
 

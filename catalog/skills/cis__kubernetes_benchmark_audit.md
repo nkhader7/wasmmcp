@@ -3,13 +3,14 @@ name: cis__kubernetes_benchmark_audit
 category: cis
 module: ripgrep@14
 sha256: 2726000000000000000000000000000000000000000000000000000000000a14
-description: Collects CIS Kubernetes Benchmark audit outputs and related Kubernetes manifest evidence from the workspace. Runtime checks are produced by scripts/cis/kubernetes-cis-audit.sh outside the MCP server on a control-plane node or read-only kubectl context.
+description: Collects Kubernetes configuration evidence for CIS Kubernetes Benchmark rule families covering control plane, etcd, kubelet, RBAC, pod security, network policy, and secrets handling.
 when: cis-benchmark, cis-kubernetes, kubernetes-audit, k8s-audit, audit, scheduled-scan
 args:
   path: /workspace
-  query: "CIS Kubernetes Benchmark"
+  rules: cis/kubernetes-benchmark
+  query: "kube-apiserver|kube-controller-manager|kube-scheduler|kubelet|etcd|RBAC|RoleBinding|ClusterRoleBinding|NetworkPolicy|PodSecurity|hostNetwork|hostPID|hostIPC|privileged|runAsNonRoot|readOnlyRootFilesystem|automountServiceAccountToken"
   maxMatches: 3000
-  focus: cis-kubernetes-runtime-audit-results-and-manifest-review
+  focus: cis-kubernetes-benchmark-rules
 caps:
   - fs:read
 export: grep
@@ -17,4 +18,6 @@ export: grep
 
 # CIS Kubernetes Benchmark Audit
 
-Collects local Kubernetes CIS audit outputs from `/workspace/audit-results/cis-kubernetes`, static pod manifests, kubelet configuration, and policy evidence for agent review. Run `scripts/cis/kubernetes-cis-audit.sh` in the Kubernetes environment first when runtime findings are needed.
+Collects Kubernetes evidence for CIS Kubernetes Benchmark rule families. Coverage includes API server, controller manager, scheduler, etcd, kubelet, RBAC, pod security, network policy, admission controls, and secrets handling.
+
+Report findings with the CIS rule or section, severity, affected Kubernetes control, `path`, `line`, and `redactedSnippet`. Do not describe the MCP server as running Kubernetes checks; it only dispatches the local module reference and capability set.

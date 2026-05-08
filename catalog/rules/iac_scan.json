@@ -1,6 +1,7 @@
 {
   "on": "iac-scan",
   "skills": [
-    "iac__ansible_checkov_audit"
+    "iac__ansible_checkov_audit",
+    "iac__checkov_all_resource_scans"
   ]
 }

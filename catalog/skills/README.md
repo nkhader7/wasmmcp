@@ -10,9 +10,9 @@ The MCP server is only a dispatcher. It reads these files, exposes each runnable
 catalog/skills/
   README.md                  # this guide, not exposed as a tool
   SKILL_TEMPLATE.md          # standard authoring template, not exposed as a tool
-  scan_secrets.md            # runnable skill
-  scan_diff.md               # runnable skill
-  tob_insecure_defaults.md   # runnable skill
+  secrets__scan_workspace.md       # runnable skill
+  analysis__security_audit.md      # runnable skill
+  iac__checkov_all_resource_scans.md # runnable skill
 ```
 
 Runnable skill files should:
@@ -22,6 +22,7 @@ Runnable skill files should:
 - reference modules as `name@version`
 - include the pinned `sha256`
 - include `args.path: /workspace`
+- name rule coverage with `args.rules` such as `p/security-audit`, `checkov/all-resource-scans`, or `cis/kubernetes-benchmark`
 - request only declared capabilities
 - keep workspace paths under `/workspace`
 
@@ -65,6 +66,10 @@ Use only modules already present in `modules/index.json`.
 | `ripgrep@14` | `grep` | text and manifest discovery |
 | `tree-sitter@0.22` | `parse_ast` | symbol, call graph, and evidence context |
 
+## Rule References
+
+Skills should reference rule sets by stable identifiers in `args.rules`. Do not point runnable skills at project-local rule files, generated exports, script paths, or user-machine paths. Rule logic and rule metadata belong in scanner code or signed module packages, while the MCP tool contract only describes which rules apply.
+
 ## Capability Rules
 
 All current skills should use:
@@ -88,8 +93,10 @@ The validator checks required frontmatter fields, `args.path: /workspace`, `fs:r
 
 ## Converted Skill Packs
 
-The `tob_*` files adapt the public Trail of Bits skills marketplace into local MCP dispatcher recipes. They are original mappings to this project's local module registry, not copies of the upstream skill bodies. See [../../docs/trailofbits-skill-map.md](../../docs/trailofbits-skill-map.md) for the coverage map and scoped-down capabilities.
+The `tob_*` files adapt public Trail of Bits security skill categories into local MCP dispatcher recipes. They are original mappings to this project's local module registry, not copies of the upstream skill bodies.
 
-The `pytm_threat_model` skill gathers local context for an agent-generated OWASP pytm model. See [../../docs/pytm-threat-model-workflow.md](../../docs/pytm-threat-model-workflow.md).
+The `pytm_threat_model` skill gathers context for an agent-generated OWASP pytm model.
 
-The `cis__docker_benchmark_audit` and `cis__kubernetes_benchmark_audit` skills collect results from local CIS Docker and Kubernetes audit scripts. See [../../docs/cis-benchmark-audit.md](../../docs/cis-benchmark-audit.md).
+The `cis__docker_benchmark_audit` and `cis__kubernetes_benchmark_audit` skills map evidence to CIS Docker and Kubernetes Benchmark rule families.
+
+The `iac__checkov_all_resource_scans` skill maps IaC evidence to the `checkov/all-resource-scans` rule set.
