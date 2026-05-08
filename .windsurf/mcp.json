@@ -2,9 +2,9 @@
   "mcpServers": {
     "wasmmcp": {
       "command": "node",
-      "args": ["./src/mcp/server.js"],
+      "args": ["./extension/out/mcp-host.js"],
       "env": {
-        "SIDECAR_WORKSPACE": "."
+        "WORKSPACE_ROOT": "."
       }
     }
   }
