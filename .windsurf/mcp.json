@@ -1,8 +1,8 @@
 ﻿{
   "mcpServers": {
-    "wasmmcp": {
+    "gitleaks-scanner-wasm": {
       "command": "node",
-      "args": ["./extension/out/mcp-host.js"],
+      "args": ["./gitleaks-extension/out/mcp-host.js"],
       "env": {
         "WORKSPACE_ROOT": "."
       }
