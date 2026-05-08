@@ -9,6 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadRules, loadSkills } from "./catalog.js";
 import { SkillDispatcher } from "./dispatcher.js";
+import { SidecarExecutor } from "./sidecar.js";
 
 const root       = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const dispatcher = new SkillDispatcher({
@@ -16,12 +17,19 @@ const dispatcher = new SkillDispatcher({
   rules:  await loadRules(path.join(root, "catalog/rules"))
 });
 
+// Sidecar mode: active when SIDECAR_WORKSPACE is set.
+// The server process is a local stdio child of the IDE — workspace bytes stay on-machine.
+const sidecar = SidecarExecutor.fromEnv();
+
 // Log startup summary to stderr (never stdout — stdout is the JSON-RPC channel)
 const summary = dispatcher.categorySummary();
 process.stderr.write(
   `[wasmmcp] loaded ${dispatcher.skills.size} skills: ` +
   Object.entries(summary).map(([c, n]) => `${c}(${n})`).join(", ") + "\n"
 );
+if (sidecar) {
+  process.stderr.write(`[wasmmcp] sidecar mode ACTIVE — workspace: ${sidecar.workspaceRoot}\n`);
+}
 
 // ── stdio JSON-RPC transport ──────────────────────────────────────────────────
 
@@ -38,7 +46,7 @@ process.stdin.on("data", chunk => {
   }
 });
 
-function handleLine(line) {
+async function handleLine(line) {
   let req;
   try {
     req = JSON.parse(line);
@@ -51,7 +59,7 @@ function handleLine(line) {
   if (req.id === undefined) return;
 
   try {
-    const result = route(req.method, req.params ?? {});
+    const result = await route(req.method, req.params ?? {});
     send({ jsonrpc: "2.0", id: req.id, result });
   } catch (err) {
     send({ jsonrpc: "2.0", id: req.id, error: { code: err.code ?? -32000, message: err.message } });
@@ -60,7 +68,7 @@ function handleLine(line) {
 
 // ── Method router ─────────────────────────────────────────────────────────────
 
-function route(method, params) {
+async function route(method, params) {
   switch (method) {
 
     case "initialize":
@@ -94,12 +102,18 @@ function route(method, params) {
       if (typeof params.name !== "string" || !params.name) {
         const err = new Error("params.name is required"); err.code = -32602; throw err;
       }
-      const result = dispatcher.resolveToolCall(params.name, params.arguments ?? {});
-      // Mirror progressToken back so the IDE plugin can correlate notifications
-      if (params._meta?.progressToken) {
-        result._meta.progressToken = params._meta.progressToken;
+      const resolved      = dispatcher.resolveToolCall(params.name, params.arguments ?? {});
+      const progressToken = params._meta?.progressToken;
+
+      // Sidecar mode: execute the scan locally and return real findings to Cascade.
+      // The server is a local stdio child of the IDE — workspace bytes never leave this machine.
+      if (sidecar) {
+        return await sidecar.execute(resolved._meta.invokeLocal, progressToken);
       }
-      return result;
+
+      // Default (dispatcher-only): return the invokeLocal module reference for the IDE plugin.
+      if (progressToken) resolved._meta.progressToken = progressToken;
+      return resolved;
     }
 
     // Respond to resources/list with an empty list (findings are inline resources)
