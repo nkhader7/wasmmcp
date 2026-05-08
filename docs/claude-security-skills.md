@@ -34,21 +34,4 @@ These skills do not add new capabilities. Every skill requests only `fs:read`, a
 
 ## Trail of Bits-Inspired Pack
 
-The `tob_*` skills adapt public Trail of Bits security skill categories into this repository's MCP dispatcher format. They are not copied skill bodies; they are local recipes that map audit intents onto the existing signed module registry.
-
-| Skill | Module | Purpose |
-|---|---|---|
-| `tob_audit_context` | `tree-sitter@0.22` | Build architectural context before vulnerability hunting. |
-| `tob_fp_check` | `tree-sitter@0.22` | Gather evidence for true-positive and false-positive review. |
-| `tob_insecure_defaults` | `semgrep@1.45` | Scan fail-open defaults, hardcoded credentials, and permissive config. |
-| `tob_sharp_edges` | `semgrep@1.45` | Scan misuse-prone APIs and dangerous configuration surfaces. |
-| `tob_variant_analysis` | `semgrep@1.45` | Search for variants of a known root-cause pattern. |
-| `tob_supply_chain_manifest_audit` | `ripgrep@14` | Collect local dependency manifests and lockfiles for supply-chain review. |
-| `tob_zeroize_source_audit` | `semgrep@1.45` | Scan source-level secret cleanup and zeroization patterns. |
-| `tob_c_cpp_security_review` | `semgrep@1.45` | Run C/C++ memory and lifetime security checks. |
-| `tob_differential_review` | `semgrep@1.45` | Review security-sensitive changed-code context. |
-| `tob_agentic_actions_audit` | `semgrep@1.45` | Scan automation workflows for agent and token risks. |
-| `tob_constant_time_analysis` | `semgrep@1.45` | Scan for obvious timing-side-channel risks. |
-| `tob_static_analysis_semgrep` | `semgrep@1.45` | General static security pass. |
-
-Trail of Bits skills that require unsupported modules or external services, such as YARA execution, CodeQL databases, Android APK parsing, GitHub API enrichment, or blockchain-specific tooling, are intentionally not represented as runnable local module invocations here.
+The `tob_*` skills adapt public Trail of Bits security skill categories into this repository's MCP dispatcher format. They are original local recipes that map audit intents onto the existing signed module registry. See [trailofbits-skill-map.md](./trailofbits-skill-map.md) for the full coverage map.

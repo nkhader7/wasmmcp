@@ -13,7 +13,8 @@
     "mcp:http": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File src/mcp/http-server.ps1 -Port 8765",
     "mcp": "node src/mcp/server.js",
     "prepublishOnly": "node --test",
-    "test": "node --test"
+    "test": "node --test",
+    "validate:skills": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/validate-skills.ps1"
   },
   "files": [
     "bin/",

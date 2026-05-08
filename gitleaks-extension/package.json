@@ -5,7 +5,6 @@
   "version": "1.0.0",
   "publisher": "nkhader7",
   "license": "MIT",
-  "icon": "media/icon.png",
   "repository": { "type": "git", "url": "git+https://github.com/nkhader7/wasmmcp.git" },
   "engines": { "vscode": "^1.96.0" },
   "categories": ["Linters", "Other"],
