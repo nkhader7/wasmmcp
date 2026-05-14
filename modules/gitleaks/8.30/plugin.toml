@@ -15,9 +15,12 @@ imports = [
   "wasi:io/streams",
   "wasi:cli/stdout",
   "wasi:cli/stderr",
+  "wasi:cli/stdin",
+  "wasi:cli/arguments",
+  "wasi:cli/environment",
+  "wasi:cli/exit",
   "wasi:clocks/monotonic-clock",
-  "wasi:random/random",
-  "wasi:cli/environment"
+  "wasi:random/random"
 ]
 filesystem = "read-only"
 preopen    = "/workspace"
