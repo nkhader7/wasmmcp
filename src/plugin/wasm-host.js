@@ -62,6 +62,11 @@ export class WasmHost {
 }
 
 // ── Layer 1: real WASM via node:wasi (preview1) ──────────────────────────────
+// NOTE: The gitleaks.wasm module is compiled for wasm32-wasip2 (WASI 0.2 component model).
+// Node.js's built-in `node:wasi` only supports WASI preview1, so this layer will fail
+// at instantiation for a wasip2 component. The catch block falls through to Layer 2/3.
+// To run the actual .wasm binary, replace this layer with wasmtime-nodejs or
+// @bytecodealliance/jco (e.g. `jco run gitleaks.wasm -- detect ...`).
 
 async function invokeWasm(wasmPath, exportName, args, invocation) {
   const argv = buildArgv(exportName, args);

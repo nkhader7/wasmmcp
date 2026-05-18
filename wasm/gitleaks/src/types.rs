@@ -44,8 +44,14 @@ pub struct RuleAllowlist {
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Finding {
+    // "RuleID" (not "RuleId") matches the upstream gitleaks CLI JSON format and
+    // the normalizer in wasm-host.js that reads f.RuleID.
+    #[serde(rename = "RuleID")]
     pub rule_id:     String,
     pub description: String,
+    // Serialized as "Tags" (an array) so mapGitleaksSeverity() in wasm-host.js can
+    // read f.Tags — consistent with real gitleaks output.
+    #[serde(rename = "Tags")]
     pub severity:    String,
     pub file:        String,
     pub start_line:  usize,

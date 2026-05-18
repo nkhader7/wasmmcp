@@ -6,7 +6,7 @@ Use this spec as the single source of truth. Do not invent components outside it
 
 ## System summary
 
-A coding-agent IDE (Windsurf, Cursor, Claude Code, Continue, or any MCP-compatible client) ships a **first-party WASM plugin**. That plugin contains a `wasmtime` runtime, a local module registry of signed `.wasm` modules (e.g. `gitleaks@8.21`, `semgrep@1.45`, `ripgrep@14`, `tree-sitter@0.22`), and a dispatcher.
+A coding-agent IDE (Windsurf, Cursor, Claude Code, Continue, or any MCP-compatible client) ships a **first-party WASM plugin**. That plugin contains a `wasmtime` runtime, a local module registry of signed `.wasm` modules (e.g. `gitleaks@8.30`, `semgrep@1.45`, `ripgrep@14`, `tree-sitter@0.22`), and a dispatcher.
 
 A separate **MCP server** (remote or sidecar) publishes **skills** and **rules** — declarative recipes that map user intent to `{ module, args, when-to-use }`. The MCP server **never receives source code and never runs WASM**. It only resolves which module the IDE plugin should invoke.
 
@@ -41,7 +41,7 @@ When the user prompts the agent, the agent's MCP client calls `tools/call` again
 - **Transport**: JSON-RPC 2.0 over stdio or http+sse. MCP spec `2025-06-18`.
 - **Skills catalog** — markdown + frontmatter:
   ```yaml
-  module: gitleaks@8.21
+  module: gitleaks@8.30
   when: "pre-commit, audit"
   args: { redact: true, severity: "low+" }
   ```
@@ -56,7 +56,7 @@ When the user prompts the agent, the agent's MCP client calls `tools/call` again
 |---|---|---|
 | `wasi:filesystem/preopens` | granted | `/workspace` read-only, fd=3 |
 | `wasi:io/streams` | granted | host-buffered |
-| `wasi:cli/stdout · stderr` | granted | piped to plugin log |
+| `wasi:cli/stdout · stderr · stdin · arguments · exit` | granted | piped to plugin log; stdin used by `--staged` mode |
 | `wasi:clocks/monotonic-clock` | granted | wall-clock denied |
 | `wasi:random/random` | granted | deterministic per-invocation seed |
 | `wasi:cli/environment` | scoped | allowlist only |
@@ -76,8 +76,8 @@ t=0      client → mcp        initialize { protocolVersion, clientInfo }
 +16ms    mcp → client        [ scan_secrets, find_dead_code, grep_repo, parse_ast ]
 +21ms    client → mcp        tools/call { name: "scan_secrets", args: { path: "/workspace" } }
 +22ms    mcp → client        result._meta.invokeLocal {
-                                module: "gitleaks@8.21",
-                                sha256: "9f1e…b203",
+                                module: "gitleaks@8.30",
+                                sha256: "7e4a…d512c3",
                                 args:   { path: "/workspace", redact: true },
                                 caps:   ["fs:read"]
                               }
@@ -93,11 +93,12 @@ t=0      client → mcp        initialize { protocolVersion, clientInfo }
 
 ## Reference module: gitleaks
 
-- Source: Go CLI, `cgo=0`.
-- Build: `tinygo build -target=wasip2 -o gitleaks.wasm ./cmd/gitleaks` → 6.4 MB.
+- Source: Rust, `wasm/gitleaks/` (`gitleaks-wasm` v8.30.1).
+- Build: `cargo build --target wasm32-wasip2 --profile release` (see `wasm/gitleaks/build.sh`).
 - Packaged as OCI artifact, cosign-signed.
-- Exports: `scan_repo(args) → ScanResult`, `scan_diff(args) → ScanResult`.
-- Findings shape: `{ rule, severity, path, line, redactedSnippet, commit? }`.
+- Entry point: `wasi:cli/run` (CLI binary — argv + stdout, not named component exports).
+- Dispatcher-level names: `scan_repo` (directory scan), `scan_diff` (stdin/staged scan).
+- Findings shape: `{ RuleID, Tags, File, StartLine, Secret, Fingerprint }` (raw); normalized to `{ rule, severity, path, line, redactedSnippet, commit? }` by the plugin host.
 
 ---
 
